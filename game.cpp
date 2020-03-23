@@ -2,68 +2,95 @@
 
 Game::Game(std::string window_title, int screen_width, int screen_height) {
 
-    if(SDL_Init(SDL_INIT_EVERYTHING) < 0)
-    {
+    if(SDL_Init(SDL_INIT_EVERYTHING) < 0) {
         printf("SDL could not initialize! SDL_Error: %s\n", SDL_GetError());
     }
-    else
-    {
+    else {
         window = SDL_CreateWindow(window_title.c_str(), SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, screen_width, screen_height, SDL_WINDOW_SHOWN);
         
-        if(window == NULL)
-        {
+        if(window == NULL) {
             printf("Window could not be created! SDL_Error: %s\n", SDL_GetError());
-            
         }
-        else
-        {
+        else {
             screen = SDL_GetWindowSurface(window);
         }
     }
+    _screen_width = screen_width;
+    _screen_height = screen_height;
 }
 
 Game::~Game() {
-    //Deallocate surface
-    SDL_FreeSurface(image);
-    image = NULL;
 
-    //Destroy window and window surface
+    for(Object* object : objects)
+        delete(object);
+
+    // Destroy textures
+    for(SDL_Surface* texture : textures)
+        SDL_FreeSurface(texture);
+
+    // Destroy window and window surface
     SDL_DestroyWindow(window);
     window = NULL;
-
-    //Quit SDL subsystems
+    
+    // Quit SDL subsystems
     SDL_Quit();
     printf("Exited game Successfully\n");
 }
 
-bool Game::load_bmp(std::string path) {
-    
-    image = SDL_LoadBMP(path.c_str());
-    if(image == NULL)
-    {
+SDL_Surface* Game::load_bmp(std::string path) {
+
+    SDL_Surface* texture = SDL_LoadBMP(path.c_str());
+    if(texture == NULL) {
         printf("Unable to load image %s! SDL Error: %s\n", path, SDL_GetError());
-        return false;
     }
     printf("Successfully loaded bmp image: %s\n", path.c_str());
-    return true;
+
+    textures.push_back(texture);
+    return texture;
 }
 
-void Game::draw_image() {
-    SDL_BlitSurface(image, NULL, screen, NULL);
+void Game::preload_object_surfaces() {
+    for(Object* object : objects) {
+
+        SDL_Rect* position = object->get_rect();
+        //if(position->x <= 0 || position->x >= _screen_width || position->y <= 0 || position->y >= _screen_height) {
+        //    continue;
+        //}
+        printf("Player position: %d, %d\n", position->x, position->y);
+        SDL_BlitSurface(object->get_texture(), object->get_current_frame(), screen, position);
+    }
 }
 
-void Game::update() {
+void Game::draw() {
     SDL_UpdateWindowSurface(window);
 }
 
 void Game::handle_events() {
     while(SDL_PollEvent(&event) != 0) {
-        
+        if(event.type == SDL_QUIT) {
+            quit = true;
+        }
     }
 }
 
+void Game::start() {
+
+    SDL_Surface* player_texture = load_bmp("assets/dudeanim.bmp");
+
+    Object* player = new Object();
+    player->set_texture(player_texture);
+    player->set_anim_frame(0);
+    objects.push_back(player);
+
+}
+
 void Game::loop() {
+    int frame = 0;
     while(!quit) {
-        update();   
+        handle_events();
+        objects.at(0)->set_anim_frame(frame % 3);
+        preload_object_surfaces();
+        draw();
+        frame++;
     }
 }
