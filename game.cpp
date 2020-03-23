@@ -21,7 +21,7 @@ Game::Game(std::string window_title, int screen_width, int screen_height) {
 
 Game::~Game() {
 
-    for(Object* object : objects)
+    for(GameObject* object : objects)
         delete(object);
 
     // Destroy textures
@@ -49,8 +49,8 @@ SDL_Surface* Game::load_bmp(std::string path) {
     return texture;
 }
 
-void Game::preload_object_surfaces() {
-    for(Object* object : objects) {
+void Game::draw() {
+    for(GameObject* object : objects) {
 
         SDL_Rect* position = object->get_rect();
         //if(position->x <= 0 || position->x >= _screen_width || position->y <= 0 || position->y >= _screen_height) {
@@ -59,9 +59,6 @@ void Game::preload_object_surfaces() {
         printf("Player position: %d, %d\n", position->x, position->y);
         SDL_BlitSurface(object->get_texture(), object->get_current_frame(), screen, position);
     }
-}
-
-void Game::draw() {
     SDL_UpdateWindowSurface(window);
 }
 
@@ -77,7 +74,7 @@ void Game::start() {
 
     SDL_Surface* player_texture = load_bmp("assets/dudeanim.bmp");
 
-    Object* player = new Object();
+    GameObject* player = new GameObject();
     player->set_texture(player_texture);
     player->set_anim_frame(0);
     objects.push_back(player);
@@ -85,11 +82,14 @@ void Game::start() {
 }
 
 void Game::loop() {
+
     int frame = 0;
+
     while(!quit) {
         handle_events();
+
         objects.at(0)->set_anim_frame(frame % 3);
-        preload_object_surfaces();
+        
         draw();
         frame++;
     }

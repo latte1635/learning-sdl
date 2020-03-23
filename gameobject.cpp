@@ -1,6 +1,6 @@
-#include "object.h"
+#include "gameobject.h"
 
-Object::Object() {
+GameObject::GameObject() {
     _rect_transform.w = 32;
     _rect_transform.h = 32;
     _rect_transform.x = 1;
@@ -10,28 +10,28 @@ Object::Object() {
     _current_anim.h = 32;
 }
 
-Object::~Object() {
+GameObject::~GameObject() {
     printf("Destroyed object\n");
 }
 
-void Object::set_position(int x, int y) {
+void GameObject::set_position(int x, int y) {
     _rect_transform.x = x;
     _rect_transform.y = y;
 }
 
-SDL_Rect* Object::get_rect() {
+SDL_Rect* GameObject::get_rect() {
     return &_rect_transform;
 }
 
-SDL_Surface* Object::get_texture() {
+SDL_Surface* GameObject::get_texture() {
     return _texture;
 }
 
-void Object::set_texture(SDL_Surface* texture) {
+void GameObject::set_texture(SDL_Surface* texture) {
     _texture = texture;
 }
 
-void Object::set_anim_frame(int sheet_pos) {
+void GameObject::set_anim_frame(int sheet_pos) {
     
     int offset_x = int(sheet_pos % 8) * 32;
     int offset_y = int(sheet_pos / 8) * 32;
@@ -42,6 +42,10 @@ void Object::set_anim_frame(int sheet_pos) {
     _current_anim.y = offset_y;
 }
 
-SDL_Rect* Object::get_current_frame() {
+SDL_Rect* GameObject::get_current_frame() {
     return &_current_anim;
+}
+
+void animate() {
+    
 }

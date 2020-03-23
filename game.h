@@ -2,10 +2,19 @@
 #include <string>
 #include <vector>
 
-#include "object.h"
+#include "gameobject.h"
 
 class Game {
 private:
+
+    enum KeyPresses {
+        KEY_PRESS_SURFACE_DEFAULT,
+        KEY_PRESS_SURFACE_UP,
+        KEY_PRESS_SURFACE_DOWN,
+        KEY_PRESS_SURFACE_LEFT,
+        KEY_PRESS_SURFACE_RIGHT,
+        KEY_PRESS_SURFACE_TOTAL,
+    };
 
     int _screen_width = 0;
     int _screen_height = 0;
@@ -13,7 +22,7 @@ private:
     SDL_Window* window = NULL;
     SDL_Surface* screen = NULL;
 
-    std::vector<Object*> objects;
+    std::vector<GameObject*> objects;
     std::vector<SDL_Surface*> textures;
 
     bool quit = false;
@@ -25,7 +34,6 @@ public:
 
     SDL_Surface* load_bmp(std::string path);
     
-    void preload_object_surfaces();
     void draw();
     void start();
     void loop();
